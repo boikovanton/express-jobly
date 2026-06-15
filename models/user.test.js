@@ -140,6 +140,7 @@ describe("get", function () {
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: false,
+      jobs: [],
     });
   });
 
@@ -149,6 +150,46 @@ describe("get", function () {
       fail();
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+});
+
+/************************************** applyToJob */
+
+describe("applyToJob", function () {
+  test("works", async function () {
+    await User.applyToJob("u1", 1);
+
+    const result = await db.query(
+      `SELECT username, job_id
+       FROM applications
+       WHERE username = 'u1'`
+    );
+
+    expect(result.rows).toEqual([
+      {
+        username: "u1",
+        job_id: 1,
+      },
+    ]);
+  });
+
+  test("works: user get shows applied jobs", async function () {
+    await User.applyToJob("u1", 1);
+    await User.applyToJob("u1", 2);
+
+    const user = await User.get("u1");
+
+    expect(user.jobs).toEqual([1, 2]);
+  });
+
+  test("bad request if duplicate application", async function () {
+    try {
+      await User.applyToJob("u1", 1);
+      await User.applyToJob("u1", 1);
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
 });
@@ -164,18 +205,18 @@ describe("update", function () {
   };
 
   test("works", async function () {
-    let job = await User.update("u1", updateData);
-    expect(job).toEqual({
+    let user = await User.update("u1", updateData);
+    expect(user).toEqual({
       username: "u1",
       ...updateData,
     });
   });
 
   test("works: set password", async function () {
-    let job = await User.update("u1", {
+    let user = await User.update("u1", {
       password: "new",
     });
-    expect(job).toEqual({
+    expect(user).toEqual({
       username: "u1",
       firstName: "U1F",
       lastName: "U1L",
@@ -215,7 +256,7 @@ describe("remove", function () {
   test("works", async function () {
     await User.remove("u1");
     const res = await db.query(
-        "SELECT * FROM users WHERE username='u1'");
+      "SELECT * FROM users WHERE username='u1'");
     expect(res.rows.length).toEqual(0);
   });
 
