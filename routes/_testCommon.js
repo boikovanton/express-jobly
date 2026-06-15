@@ -7,6 +7,8 @@ const { createToken } = require("../helpers/tokens");
 
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
+  await db.query("DELETE FROM jobs");
+  // noinspection SqlWithoutWhere
   await db.query("DELETE FROM users");
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM companies");
@@ -34,6 +36,14 @@ async function commonBeforeAll() {
     description: "Desc3",
     logoUrl: "http://c3.img",
   });
+
+  await db.query(`
+    INSERT INTO jobs (id, title, salary, equity, company_handle)
+    VALUES
+      (1, 'Job1', 100000, '0', 'c1'),
+      (2, 'Job2', 200000, '0.05', 'c1'),
+      (3, 'Job3', 300000, '0', 'c2')
+  `);
 
   await User.register({
     username: "u1",

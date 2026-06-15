@@ -31,9 +31,9 @@ describe("create", function () {
     expect(company).toEqual(newCompany);
 
     const result = await db.query(
-          `SELECT handle, name, description, num_employees, logo_url
-           FROM companies
-           WHERE handle = 'new'`);
+      `SELECT handle, name, description, num_employees, logo_url
+       FROM companies
+       WHERE handle = 'new'`);
     expect(result.rows).toEqual([
       {
         handle: "new",
@@ -212,6 +212,20 @@ describe("get", function () {
       description: "Desc1",
       numEmployees: 1,
       logoUrl: "http://c1.img",
+      jobs: [
+        {
+          id: 1,
+          title: "Job1",
+          salary: 100000,
+          equity: "0",
+        },
+        {
+          id: 2,
+          title: "Job2",
+          salary: 200000,
+          equity: "0.05",
+        },
+      ],
     });
   });
 
@@ -243,9 +257,9 @@ describe("update", function () {
     });
 
     const result = await db.query(
-          `SELECT handle, name, description, num_employees, logo_url
-           FROM companies
-           WHERE handle = 'c1'`);
+      `SELECT handle, name, description, num_employees, logo_url
+       FROM companies
+       WHERE handle = 'c1'`);
     expect(result.rows).toEqual([{
       handle: "c1",
       name: "New",
@@ -270,9 +284,9 @@ describe("update", function () {
     });
 
     const result = await db.query(
-          `SELECT handle, name, description, num_employees, logo_url
-           FROM companies
-           WHERE handle = 'c1'`);
+      `SELECT handle, name, description, num_employees, logo_url
+       FROM companies
+       WHERE handle = 'c1'`);
     expect(result.rows).toEqual([{
       handle: "c1",
       name: "New",
@@ -307,7 +321,7 @@ describe("remove", function () {
   test("works", async function () {
     await Company.remove("c1");
     const res = await db.query(
-        "SELECT handle FROM companies WHERE handle='c1'");
+      "SELECT handle FROM companies WHERE handle='c1'");
     expect(res.rows.length).toEqual(0);
   });
 
